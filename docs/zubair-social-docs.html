@@ -1,0 +1,1245 @@
+<title>Zubair Social Docs</title>
+<meta name="description" content="Build plan aur feature-by-feature specs for the Zubair Social Android app, with rendered Mermaid diagrams.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --accent:#6C5CE7;
+    --accent-deep:#4A3FC4;
+    --accent-soft:#EEEAFC;
+    --success:#0E9F6E;
+    --success-soft:#DFF5EC;
+    --warning:#9A6300;
+    --warning-soft:#FBF0DA;
+    --paper:#FAF9FF;
+    --surface:#F2EFFB;
+    --surface-2:#FFFFFF;
+    --line:#E2DCF5;
+    --ink:#201C33;
+    --ink-soft:#5C5775;
+    --code-bg:#EFEAFB;
+    --shadow: 0 1px 2px rgba(32,28,51,0.04), 0 6px 20px rgba(32,28,51,0.05);
+    --font-display:'Sora', system-ui, sans-serif;
+    --font-body:'Source Sans 3', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --accent:#A294F7;
+      --accent-deep:#CBC0FF;
+      --accent-soft:#2A2448;
+      --success:#3FD69C;
+      --success-soft:#163C2E;
+      --warning:#E4AC4C;
+      --warning-soft:#3B2E10;
+      --paper:#130F1F;
+      --surface:#1C1830;
+      --surface-2:#211C38;
+      --line:#352D53;
+      --ink:#EEEBFB;
+      --ink-soft:#AEA7CE;
+      --code-bg:#241E3D;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --accent:#A294F7;
+    --accent-deep:#CBC0FF;
+    --accent-soft:#2A2448;
+    --success:#3FD69C;
+    --success-soft:#163C2E;
+    --warning:#E4AC4C;
+    --warning-soft:#3B2E10;
+    --paper:#130F1F;
+    --surface:#1C1830;
+    --surface-2:#211C38;
+    --line:#352D53;
+    --ink:#EEEBFB;
+    --ink-soft:#AEA7CE;
+    --code-bg:#241E3D;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+  }
+  h1,h2,h3,h4{
+    font-family:var(--font-display);
+    color:var(--ink);
+    text-wrap:balance;
+    line-height:1.25;
+    margin:0 0 .5em;
+  }
+  a{ color:var(--accent-deep); }
+  :root[data-theme="dark"] a, @media (prefers-color-scheme: dark){ a{ color:var(--accent);} }
+  code{
+    font-family:var(--font-mono);
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.12em .4em;
+    border-radius:5px;
+  }
+
+  /* ---------- layout shell ---------- */
+  .shell{ display:flex; min-height:100vh; }
+
+  .sidebar{
+    width:268px;
+    flex-shrink:0;
+    position:sticky;
+    top:0;
+    align-self:flex-start;
+    height:100vh;
+    overflow-y:auto;
+    border-right:1px solid var(--line);
+    background:var(--surface);
+    padding:28px 20px 40px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:4px;
+  }
+  .brand-mark{
+    width:30px; height:30px; border-radius:9px;
+    background:linear-gradient(135deg, var(--accent), var(--accent-deep));
+    flex-shrink:0;
+  }
+  .brand-name{ font-family:var(--font-display); font-weight:700; font-size:1.05rem; }
+  .brand-sub{
+    font-size:.82rem; color:var(--ink-soft); margin:2px 0 22px 40px;
+  }
+
+  .nav-group{ margin-bottom:22px; }
+  .nav-group-label{
+    font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 8px 10px;
+  }
+  .nav-group a{
+    display:block;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:.92rem;
+    padding:7px 10px;
+    border-radius:8px;
+    margin-bottom:1px;
+    border-left:2px solid transparent;
+  }
+  .nav-group a:hover{ background:var(--surface-2); color:var(--ink); }
+  .nav-group a.active{
+    color:var(--accent-deep);
+    background:var(--accent-soft);
+    border-left:2px solid var(--accent);
+    font-weight:600;
+  }
+
+  .nav-toggle{ display:none; }
+
+  .content{
+    flex:1;
+    min-width:0;
+    max-width:860px;
+    padding:48px 56px 100px;
+  }
+  .doc-col{ max-width:680px; }
+
+  .page-head{ margin-bottom:46px; }
+  .status-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.78rem; font-weight:600;
+    color:var(--warning);
+    background:var(--warning-soft);
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+  .status-badge::before{ content:"●"; font-size:.6rem; }
+  .page-head h1{ font-size:2.15rem; margin-bottom:10px; }
+  .page-head p{ color:var(--ink-soft); font-size:1.05rem; max-width:60ch; }
+
+  section.doc-section{
+    padding-top:52px;
+    margin-top:0;
+    border-top:1px solid var(--line);
+    scroll-margin-top:24px;
+  }
+  section.doc-section:first-of-type{ border-top:none; }
+  .doc-section h2{
+    font-size:1.5rem;
+    display:flex; align-items:baseline; gap:10px;
+  }
+  .doc-section .eyebrow{
+    font-family:var(--font-mono);
+    font-size:.78rem;
+    color:var(--accent);
+    font-weight:500;
+  }
+  .doc-section h3{ font-size:1.1rem; margin-top:1.6em; }
+  .doc-section p{ max-width:68ch; }
+  .doc-section > p, .doc-section > ul, .doc-section > ol{ max-width:68ch; }
+
+  .feature-section{
+    padding:40px 36px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    margin-top:28px;
+  }
+  .feature-section h2{ font-size:1.6rem; }
+  .feature-kicker{
+    font-family:var(--font-mono); font-size:.8rem; color:var(--accent-deep);
+    text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;
+  }
+
+  /* ---------- diagram cards ---------- */
+  .diagram-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 18px 10px;
+    margin:18px 0 28px;
+    overflow-x:auto;
+  }
+  .diagram-label{
+    font-size:.78rem; font-weight:600; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.05em;
+    margin-bottom:10px;
+  }
+  pre.mermaid{ margin:0; background:transparent; }
+
+  /* ---------- tables ---------- */
+  .table-wrap{ overflow-x:auto; margin:18px 0 28px; }
+  table.data-table{
+    border-collapse:collapse;
+    width:100%;
+    font-size:.92rem;
+    min-width:480px;
+  }
+  table.data-table th, table.data-table td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data-table th{
+    background:var(--surface);
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  table.data-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- lists ---------- */
+  ul.plain, ol.plain{ padding-left:1.3em; }
+  ul.plain li, ol.plain li{ margin-bottom:6px; max-width:66ch; }
+  ol.plain li::marker{ color:var(--accent-deep); font-weight:600; font-family:var(--font-mono); font-size:.9em; }
+
+  ul.checklist{ list-style:none; padding-left:0; margin:16px 0 28px; }
+  ul.checklist li{
+    position:relative;
+    padding-left:30px;
+    margin-bottom:10px;
+    max-width:66ch;
+  }
+  ul.checklist li::before{
+    content:"";
+    position:absolute; left:0; top:3px;
+    width:16px; height:16px;
+    border:1.5px solid var(--ink-soft);
+    border-radius:4px;
+  }
+
+  /* ---------- callouts ---------- */
+  .callout{
+    border-left:3px solid var(--accent);
+    background:var(--accent-soft);
+    padding:14px 18px;
+    border-radius:0 10px 10px 0;
+    margin:18px 0 28px;
+    font-size:.95rem;
+  }
+  .callout.warning{ border-left-color:var(--warning); background:var(--warning-soft); }
+  .callout strong{ display:block; font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; opacity:.85;}
+
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 28px; }
+  .chip{
+    font-family:var(--font-mono); font-size:.82rem;
+    background:var(--surface); border:1px solid var(--line);
+    padding:5px 11px; border-radius:999px; color:var(--ink);
+  }
+
+  .tree-block{
+    background:var(--code-bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 20px;
+    overflow-x:auto;
+    margin:18px 0 28px;
+    font-family:var(--font-mono);
+    font-size:.86rem;
+    line-height:1.7;
+    white-space:pre;
+  }
+  .tree-block .k{ color:var(--accent-deep); }
+  .tree-block .c{ color:var(--ink-soft); }
+
+  footer.doc-footer{
+    margin-top:60px; padding-top:24px; border-top:1px solid var(--line);
+    color:var(--ink-soft); font-size:.85rem;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 920px){
+    .sidebar{
+      position:fixed; z-index:40; left:0; top:0;
+      transform:translateX(-100%);
+      transition:transform .22s ease;
+      box-shadow:var(--shadow);
+    }
+    .sidebar.open{ transform:translateX(0); }
+    .nav-toggle{
+      display:flex; align-items:center; gap:8px;
+      position:fixed; top:16px; left:16px; z-index:50;
+      background:var(--surface-2); border:1px solid var(--line);
+      border-radius:10px; padding:9px 14px;
+      font-family:var(--font-body); font-size:.85rem; color:var(--ink);
+      box-shadow:var(--shadow);
+    }
+    .scrim{
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:30;
+    }
+    .scrim.show{ display:block; }
+    .content{ padding:84px 22px 80px; max-width:100%; }
+    .feature-section{ padding:26px 20px; }
+  }
+</style>
+
+<div class="shell">
+  <button class="nav-toggle" id="navToggle">☰ Contents</button>
+  <div class="scrim" id="scrim"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">Zubair Social</div>
+    </div>
+    <div class="brand-sub">Build plan &amp; feature specs</div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Project Plan</div>
+      <a href="#overview">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#data-model">Data Model</a>
+      <a href="#features-overview">Features (MVP scope)</a>
+      <a href="#design-reference">Design Reference</a>
+      <a href="#design-system">Design System Plan</a>
+      <a href="#build-order">Build Order</a>
+      <a href="#open-decisions">Open Decisions</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Feature Specs</div>
+      <a href="#feature-auth">1 · Users &amp; Auth</a>
+      <a href="#feature-profile">2 · Profile</a>
+      <a href="#feature-create-post">3 · Create Post</a>
+      <a href="#feature-feed">4 · Home Feed</a>
+      <a href="#feature-search">5 · Search</a>
+      <a href="#feature-notifications">6 · Notifications</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div class="doc-col">
+      <div class="page-head">
+        <div class="status-badge">Sirf Planning — abhi tak koi code nahi</div>
+        <h1>Zubair Social — Project Plan</h1>
+        <p>Ek simple Instagram-clone <strong>native Android app</strong>, learning project ke taur pe. Main learning goal: <strong>Design Systems</strong> — sath mein Firebase aur Cloudflare R2 ka basic integration.</p>
+      </div>
+
+      <section class="doc-section" id="overview">
+        <span class="eyebrow">01</span>
+        <h2>Overview</h2>
+        <p>Working directory: <code>/Users/zubairahmad/Desktop/zubair-social</code>. Yeh document har feature ka data model, flow diagram, aur build-order ek jagah rakhta hai — development shuru karne se pehle reference ke liye.</p>
+      </section>
+
+      <section class="doc-section" id="architecture">
+        <span class="eyebrow">02</span>
+        <h2>Architecture</h2>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Layer</th><th>Choice</th><th>Kyun</th></tr>
+            <tr><td>Client</td><td>Kotlin + Jetpack Compose</td><td>Compose mein UI reusable functions ki tarah banta hai — design-system soch ke liye fit</td></tr>
+            <tr><td>Auth</td><td>Firebase Authentication</td><td>Email/password + Google Sign-In, minimal setup</td></tr>
+            <tr><td>Data</td><td>Firebase Realtime Database</td><td>Sara app data yahan — users, posts, follows, notifications</td></tr>
+            <tr><td>Image storage</td><td>Cloudflare R2</td><td>Firebase Storage ki jagah explicitly chuna gaya</td></tr>
+            <tr><td>Upload signing</td><td>Cloudflare Worker</td><td>R2 ke paas client-safe direct upload nahi — Worker presigned URL deta hai</td></tr>
+          </table>
+        </div>
+
+        <p><strong>Flow:</strong> App Worker se presigned URL mangti hai → seedha R2 pe upload karti hai → R2 file URL deta hai → wo URL + post data RTDB mein likha jata hai. Yeh ek real-world "signed URLs" pattern hai, sirf shortcut nahi.</p>
+
+        <div class="diagram-card">
+          <div class="diagram-label">Upload &amp; data flow</div>
+          <pre class="mermaid">
+flowchart LR
+    App[Android App\nKotlin + Jetpack Compose]
+
+    App --&gt;|login/signup| Auth[Firebase Auth]
+    App --&gt;|1. presigned URL mango| Worker[Cloudflare Worker]
+    Worker --&gt;|2. temporary upload URL| App
+    App --&gt;|3. image PUT karo| R2[(Cloudflare R2)]
+    R2 --&gt;|4. file URL| App
+    App --&gt;|5. data + imageUrl likho| DB[(Firebase Realtime DB)]
+    DB --&gt;|real-time read| App
+
+    style App fill:#6C5CE7,color:#fff
+    style Auth fill:#FFA000,color:#fff
+    style Worker fill:#F38020,color:#fff
+    style R2 fill:#F38020,color:#fff
+    style DB fill:#FFA000,color:#fff
+          </pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="data-model">
+        <span class="eyebrow">03</span>
+        <h2>Data Model (Firebase RTDB)</h2>
+        <p>RTDB ek bada JSON tree hota hai — koi joins nahi hote, is liye data jaan-boojh kar duplicate kiya jata hai taake reading fast rahe.</p>
+
+        <div class="tree-block">/users/{uid}
+    <span class="c">username, bio, avatarUrl, createdAt</span>
+
+/usernames/{username} : uid
+    <span class="c">→ fast username lookup + prefix search ke liye</span>
+
+/posts/{postId}
+    <span class="c">uid, imageUrl, caption, createdAt, likeCount</span>
+
+/userPosts/{uid}/{postId} : true
+    <span class="c">→ "is user ke posts" nikalne ke liye</span>
+
+/feedPosts/{postId} : { uid, createdAt }
+    <span class="c">→ MVP feed = sab logon ke posts, newest pehle</span>
+
+/follows/{uid}/following/{otherUid} : true
+/follows/{uid}/followers/{otherUid} : true
+
+/notifications/{uid}/{notifId}
+    <span class="c">type (like | comment | follow), fromUid, postId, read, createdAt</span></div>
+
+        <p><strong>Search</strong> ke liye RTDB mein full-text search nahi hota — <code>/usernames</code> pe <code>orderByKey().startAt(q).endAt(q+"")</code> se prefix search karte hain.</p>
+
+        <h3>Data relationships</h3>
+        <div class="diagram-card">
+          <div class="diagram-label">Entity relationships (logical, RTDB khud joins nahi karta)</div>
+          <pre class="mermaid">
+erDiagram
+    USERS ||--o{ POSTS : "banata hai"
+    USERS ||--|| USERNAMES : "reserve karta hai"
+    USERS ||--o{ NOTIFICATIONS : "receive karta hai"
+    USERS }o--o{ FOLLOWS : "follow / followed by"
+    POSTS ||--o{ FEEDPOSTS : "reference"
+    POSTS ||--o{ USERPOSTS : "reference"
+
+    USERS {
+        string uid PK
+        string username
+        string bio
+        string avatarUrl
+    }
+    USERNAMES {
+        string username PK
+        string uid FK
+    }
+    POSTS {
+        string postId PK
+        string uid FK
+        string imageUrl
+        string caption
+        int likeCount
+    }
+    FEEDPOSTS {
+        string postId FK
+        string uid FK
+        long createdAt
+    }
+    USERPOSTS {
+        string uid FK
+        string postId FK
+    }
+    FOLLOWS {
+        string uid FK
+        string otherUid FK
+    }
+    NOTIFICATIONS {
+        string notifId PK
+        string targetUid FK
+        string type
+        string fromUid FK
+        boolean read
+    }
+          </pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="features-overview">
+        <span class="eyebrow">04</span>
+        <h2>Features (MVP scope)</h2>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Feature</th><th>Screens</th><th>Notes</th></tr>
+            <tr><td>Users (Auth)</td><td>Login, Sign up</td><td>Email/password + Google. Signup pe <code>/users/{uid}</code> + <code>/usernames/{username}</code> banta hai.</td></tr>
+            <tr><td>Profile</td><td>Profile</td><td>Avatar, bio, stats, post grid, Edit profile.</td></tr>
+            <tr><td>Create Post</td><td>New post → Uploading</td><td>Photo Picker → Worker → R2 → RTDB.</td></tr>
+            <tr><td>Feed</td><td>Home Feed</td><td><code>/feedPosts</code> newest-first, <code>PostCard</code> se render.</td></tr>
+            <tr><td>Search</td><td>Search</td><td>Username prefix search + inline Follow.</td></tr>
+            <tr><td>Notifications</td><td>Notifications</td><td><code>/notifications/{uid}</code> real-time list. In-app only, push nahi.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout warning">
+          <strong>V2 ke liye deferred (Stitch design mein hai, MVP se nikala gaya)</strong>
+          Add location · Tag people · Advanced settings (comments/sharing/accessibility) · Following-based feed · Push notifications (FCM)
+        </div>
+      </section>
+
+      <section class="doc-section" id="design-reference">
+        <span class="eyebrow">05</span>
+        <h2>Design Reference (Google Stitch)</h2>
+        <p>Project <strong>"Zubair Social Login Screen"</strong> — 8 screens: Login, Sign up, Home Feed, Create Post, Create Post (Uploading), Search, Notifications, Profile. Look: purple/indigo accent, clean cards, 5-icon bottom nav.</p>
+
+        <h3>Reusable components (→ design system)</h3>
+        <div class="chip-row">
+          <span class="chip">BottomNavBar</span>
+          <span class="chip">PostCard</span>
+          <span class="chip">FollowButton</span>
+          <span class="chip">Avatar</span>
+          <span class="chip">ListRow</span>
+          <span class="chip">PrimaryButton</span>
+          <span class="chip">TextField</span>
+        </div>
+      </section>
+
+      <section class="doc-section" id="design-system">
+        <span class="eyebrow">06</span>
+        <h2>Design System Plan</h2>
+        <p>Main learning focus — isko alag se treat karo, afterthought nahi:</p>
+        <ul class="plain">
+          <li><strong>Pehle tokens</strong> — colors, spacing, typography, radius <code>Theme.kt</code> mein, kisi screen se pehle.</li>
+          <li><strong>Core components ek hi baar banao</strong> — PrimaryButton, Avatar, FollowButton, PostCard shell, ListRow, BottomNavBar.</li>
+          <li><strong>Rule:</strong> UI chunk dusri baar copy-paste ho raha ho to usay <code>@Composable</code> bana do.</li>
+          <li><strong>Catalog banao</strong> — har component pe <code>@Preview</code>, Storybook jaisa visual gallery.</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="build-order">
+        <span class="eyebrow">07</span>
+        <h2>Suggested Build Order</h2>
+        <p>Order random nahi — har step agle ke liye zaroori cheez deta hai.</p>
+
+        <div class="diagram-card">
+          <div class="diagram-label">Dependency chain</div>
+          <pre class="mermaid">
+flowchart TD
+    A["1. Design tokens + core components\n(Theme.kt, Button, TextField, Avatar)"] --&gt; B["2. Users / Auth\n(Login, Sign up)"]
+    B --&gt;|"uid milta hai, baaki sab isi pe depend karta hai"| C["3. Profile (read-only)"]
+    C --&gt;|"RTDB read ki practice ho jati hai"| D["4. Create Post\n(Photo Picker → Worker → R2 → RTDB)"]
+    D --&gt;|"ab asli posts data mein maujood hain"| E["5. Feed\n(RTDB read + PostCard list)"]
+    B --&gt;|"/usernames step 2 mein ban chuka tha"| F["6. Search\n(username query + Follow)"]
+    E --&gt;|"Like trigger karta hai"| G["7. Notifications\n(real-time listener)"]
+    F --&gt;|"Follow bhi trigger karta hai"| G
+
+    style A fill:#6C5CE7,color:#fff
+    style B fill:#6C5CE7,color:#fff
+    style G fill:#00B894,color:#fff
+          </pre>
+        </div>
+
+        <ul class="plain">
+          <li>Android Studio project + Firebase connect (<code>google-services.json</code>)</li>
+          <li><code>Theme.kt</code> + core composables</li>
+          <li>Auth screens (Login/Signup)</li>
+          <li>Profile (read-only)</li>
+          <li>Create Post — MVP version, location/tag-people/advanced-settings ke baghair</li>
+          <li>Feed</li>
+          <li>Search</li>
+          <li>Notifications</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Kyun isi order mein</strong>
+          Auth sabse pehle kyunki har feature <code>uid</code> maangta hai · Create Post, Feed se pehle kyunki Feed ko posts chahiye · Notifications sabse aakhir kyunki yeh Like aur Follow ka by-product hain
+        </div>
+      </section>
+
+      <section class="doc-section" id="open-decisions">
+        <span class="eyebrow">08</span>
+        <h2>Open Decisions</h2>
+        <ul class="checklist">
+          <li>Compose vs. XML Views — Compose recommended, confirm nahi hua</li>
+          <li>Cloudflare Worker ka exact implementation — abhi design nahi hua</li>
+          <li>Google Sign-In abhi se, ya v1 mein sirf email/password</li>
+        </ul>
+      </section>
+
+      <!-- ============== FEATURE SPECS ============== -->
+
+      <section class="doc-section" id="feature-auth" style="margin-top:12px;">
+        <span class="eyebrow">Feature 1</span>
+        <h2>Users (Authentication)</h2>
+        <p>Login aur Sign up — app ka entry point. Har user ka ek unique <code>username</code> hota hai jo Search aur Profile dono mein use hota hai.</p>
+
+        <div class="chip-row">
+          <span class="chip">Login</span>
+          <span class="chip">Sign up</span>
+        </div>
+
+        <h3>App Launch — Pehla Screen Kaun Sa Khulta Hai?</h3>
+        <p>Yeh sabse pehla decision hai, Login screen dikhane se bhi pehle:</p>
+        <ol class="plain">
+          <li>App open hoti hai</li>
+          <li>App check karta hai: <code>FirebaseAuth.getInstance().currentUser</code> — kya session already saved hai?</li>
+          <li><strong>Session maujood hai</strong> → Login screen skip, seedha Home Feed</li>
+          <li><strong>Session nahi hai</strong> → Login screen dikhta hai</li>
+        </ol>
+        <div class="callout">
+          Firebase Auth SDK session ko khud secure storage mein save karta hai — app ko manually token check karne ki zarurat nahi, bas <code>currentUser</code> null hai ya nahi dekhna hota hai.
+        </div>
+
+        <h3>Signup — Agar Account Nahi Hai (Step by Step)</h3>
+        <ol class="plain">
+          <li>"Don't have an account? Sign up" tap karta hai</li>
+          <li>Form fill karta hai: Email, Full name, Username, Password (6+ chars)</li>
+          <li>Username type karte waqt debounced availability check chal sakta hai (optional, acha UX)</li>
+          <li>"Sign up" button dabata hai</li>
+          <li><strong>Client-side validation</strong> pehle — email format, username characters, password length — fail ho to network call hi nahi jata</li>
+          <li>App <code>GET /usernames/{username}</code> check karta hai — <strong>taken</strong> hai to error, yahin ruk jata hai</li>
+          <li>App <code>FirebaseAuth.createUserWithEmailAndPassword()</code> call karta hai</li>
+          <li><strong>Success</strong> → naya <code>uid</code> milta hai</li>
+          <li>RTDB mein do writes: <code>/users/{uid}</code> aur <code>/usernames/{username}</code></li>
+          <li>Home Feed pe navigate</li>
+        </ol>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Signup fail hone ki wajah</th><th>Kab</th><th>User ko kya dikhao</th></tr>
+            <tr><td>Username already taken</td><td>RTDB check mein exist karta hai</td><td>"Yeh username pehle se liya ja chuka hai"</td></tr>
+            <tr><td>Email already in use</td><td><code>ERROR_EMAIL_ALREADY_IN_USE</code></td><td>"Is email se pehle se account hai — Login try karo"</td></tr>
+            <tr><td>Weak password</td><td><code>ERROR_WEAK_PASSWORD</code></td><td>"Password kam se kam 6 characters ka ho"</td></tr>
+            <tr><td>Invalid email</td><td><code>ERROR_INVALID_EMAIL</code></td><td>"Sahi email address darj karo"</td></tr>
+            <tr><td>Invalid username chars</td><td>Client-side validation</td><td>"Sirf letters, numbers, underscore allowed"</td></tr>
+            <tr><td>No internet</td><td>Network exception</td><td>"Internet connection check karo"</td></tr>
+          </table>
+        </div>
+
+        <div class="callout warning">
+          <strong>Advanced edge case (abhi sirf note)</strong>
+          Username check aur account create ke <em>beech</em> koi doosra user wohi username le sakta hai (race condition) — RTDB mein SQL jaisi transaction safety nahi. MVP ke liye accept kiya gaya risk hai.
+        </div>
+
+        <h3>Login — Jab Account Already Maujood Hai (Step by Step)</h3>
+        <ol class="plain">
+          <li>Email + password darj karta hai, "Log in" dabata hai</li>
+          <li>Client-side sanity check (khali fields na hon)</li>
+          <li>App <code>FirebaseAuth.signInWithEmailAndPassword()</code> call karta hai</li>
+          <li>Firebase email + password server pe verify karta hai</li>
+          <li><strong>Success</strong> → <code>uid</code> milta hai, session device pe save ho jata hai</li>
+          <li>App <code>/users/{uid}</code> se profile read karta hai</li>
+          <li>Home Feed pe navigate</li>
+        </ol>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Login fail hone ki wajah</th><th>Firebase error code</th><th>User ko kya dikhao</th></tr>
+            <tr><td>Galat password</td><td><code>ERROR_WRONG_PASSWORD</code></td><td>"Password galat hai, dobara try karo"</td></tr>
+            <tr><td>Email se account hi nahi</td><td><code>ERROR_USER_NOT_FOUND</code></td><td>"Account nahi mila — Sign up karo?"</td></tr>
+            <tr><td>Invalid email format</td><td><code>ERROR_INVALID_EMAIL</code></td><td>"Sahi email address darj karo"</td></tr>
+            <tr><td>Account disabled</td><td><code>ERROR_USER_DISABLED</code></td><td>"Yeh account disable kar diya gaya hai"</td></tr>
+            <tr><td>Bohat zyada attempts</td><td><code>ERROR_TOO_MANY_REQUESTS</code></td><td>"Thodi der baad try karo"</td></tr>
+            <tr><td>No internet</td><td>Network exception</td><td>"Internet connection check karo"</td></tr>
+          </table>
+        </div>
+
+        <div class="callout">
+          <strong>UX tip</strong>
+          "Email galat hai" vs "password galat hai" alag mat batao — security ke liye risky (attacker ko pata chal jata hai email valid hai). Generic rakho: "Email ya password galat hai".
+        </div>
+
+        <h3>Flow — Sign Up</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant App as Android App
+    participant Auth as Firebase Auth
+    participant DB as Realtime Database
+
+    U-&gt;&gt;App: Email, Username, Password darj karta hai
+    App-&gt;&gt;DB: GET /usernames/{username}
+    alt username pehle se maujood hai
+        DB--&gt;&gt;App: value exists
+        App--&gt;&gt;U: "Username already taken" error
+    else username available hai
+        DB--&gt;&gt;App: null
+        App-&gt;&gt;Auth: createUserWithEmailAndPassword()
+        Auth--&gt;&gt;App: uid
+        App-&gt;&gt;DB: SET /users/{uid} = {username, bio:"", avatarUrl:"", createdAt}
+        App-&gt;&gt;DB: SET /usernames/{username} = uid
+        DB--&gt;&gt;App: success
+        App--&gt;&gt;U: Navigate to Home Feed
+    end
+          </pre>
+        </div>
+
+        <h3>Flow — Login</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[User email + password darj karta hai] --&gt; B{Firebase Auth\nsignInWithEmailAndPassword}
+    B --&gt;|Success| C[uid mil gaya]
+    C --&gt; D[/users/uid se profile read karo/]
+    D --&gt; E[Navigate to Home Feed]
+    B --&gt;|Fail| F[Error dikhao: galat email/password]
+          </pre>
+        </div>
+
+        <h3>RTDB Data Touched</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Path</th><th>Operation</th><th>Kab</th></tr>
+            <tr><td><code>/users/{uid}</code></td><td>write</td><td>Signup ke waqt (create)</td></tr>
+            <tr><td><code>/usernames/{username}</code></td><td>read</td><td>Signup — availability check</td></tr>
+            <tr><td><code>/usernames/{username}</code></td><td>write</td><td>Signup — reserve</td></tr>
+            <tr><td><code>/users/{uid}</code></td><td>read</td><td>Login ke baad (profile load)</td></tr>
+          </table>
+        </div>
+
+        <h3>Design System Components</h3>
+        <div class="chip-row">
+          <span class="chip">TextField</span>
+          <span class="chip">PrimaryButton</span>
+          <span class="chip">GoogleButton</span>
+        </div>
+
+        <h3>Build Checklist</h3>
+        <ul class="checklist">
+          <li>Firebase project banao, <code>google-services.json</code> add karo</li>
+          <li>Firebase Auth enable karo (Email/Password provider)</li>
+          <li><code>Theme.kt</code> ke tokens se <code>TextField</code> aur <code>PrimaryButton</code> composables banao</li>
+          <li>Sign up: username availability debounced check se pehle hi karwao, better UX</li>
+          <li>Sign up: Auth create + RTDB write ek hi jagah — RTDB write fail ho to Auth user already ban chuka hoga, error handle karo</li>
+          <li>Login: galat password pe clear error message</li>
+          <li>Google Sign-In baad mein add karo (v1.1) — abhi email/password se shuru</li>
+          <li>App launch pe <code>currentUser</code> check karo — already logged in to Login screen skip</li>
+        </ul>
+
+        <h3>Edge Cases</h3>
+        <ul class="plain">
+          <li>Username mein sirf letters/numbers/underscore allow karo</li>
+          <li>Username already taken → clear error, dusra try karne do</li>
+          <li>App restart pe current user check karo — already logged in to seedha Feed pe</li>
+          <li>Logout pe <code>FirebaseAuth.getInstance().signOut()</code> — agli baar Login screen wapas dikhega</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="feature-profile">
+        <span class="eyebrow">Feature 2</span>
+        <h2>Profile</h2>
+        <p>User ka apna profile — avatar, bio, stats, aur uske posts ka grid.</p>
+
+        <h3>Profile Load — Step by Step</h3>
+        <ol class="plain">
+          <li>Bottom nav se "Profile" tab tap karta hai</li>
+          <li>App current <code>uid</code> nikalta hai, loading skeleton dikhata hai</li>
+          <li>Parallel mein teen reads: <code>/users/{uid}</code>, <code>/userPosts/{uid}</code>, <code>/follows/{uid}/...</code></li>
+          <li><code>/users/{uid}</code> aate hi header render — avatar, naam, bio</li>
+          <li><code>/follows</code> aate hi stats row update — <code>.getChildrenCount()</code> se</li>
+          <li>Har <code>postId</code> ke liye alag <code>/posts/{postId}</code> read (N+1 pattern, MVP ke liye theek)</li>
+          <li>Grid mein thumbnails fill hoti jati hain</li>
+          <li>Koi posts nahi → empty state: "Abhi tak koi post nahi"</li>
+        </ol>
+        <div class="callout">
+          Real-time listener zaroori nahi yahan — screen open hone par ek baar fetch kaafi hai. Follower count har second change nahi hoti.
+        </div>
+
+        <h3>Edit Profile — Step by Step</h3>
+        <ol class="plain">
+          <li>"Edit profile" tap (sirf apne profile pe dikhta hai)</li>
+          <li>Form khulta hai, current values pehle se bhare hue</li>
+          <li>Avatar badalta hai to → same Photo Picker → Worker → R2 flow jo Create Post mein hai</li>
+          <li>Bio/naam sirf text hai, koi upload nahi</li>
+          <li>"Save" tap → client-side validate (e.g. bio max length)</li>
+          <li><code>UPDATE /users/{uid}</code> — <strong>sirf changed fields</strong>, poora object overwrite nahi</li>
+          <li>Success → form band, updated data turant dikhao</li>
+          <li>Fail → error dikhao, form band mat karo, unsaved changes rakho</li>
+        </ol>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Edit Profile fail hone ki wajah</th><th>User ko kya dikhao</th></tr>
+            <tr><td>Internet nahi hai</td><td>"Internet connection check karo"</td></tr>
+            <tr><td>Avatar upload fail</td><td>"Photo upload nahi ho saki — dobara try karo" (bio/naam alag save ho sakta hai)</td></tr>
+            <tr><td>Bio bohat lambi</td><td>"Bio 150 characters se zyada nahi ho sakti" (client-side hi roko)</td></tr>
+            <tr><td>RTDB write fail</td><td>"Changes save nahi ho sake — dobara try karo"</td></tr>
+          </table>
+        </div>
+
+        <h3>Apna vs. Doosre Ka Profile</h3>
+        <p>Same screen, bas <code>uid</code> parameter doosre user ka hota hai:</p>
+        <ol class="plain">
+          <li>Feed mein username tap, ya Search se kisi result pe tap</li>
+          <li>Profile screen khulta hai <code>uid</code> = doosre user ka</li>
+          <li>"Edit profile" button gayab, uski jagah "Follow"/"Following" button</li>
+          <li>App check karta hai: <code>/follows/{myUid}/following/{otherUid}</code> exist karta hai? → button state decide hota hai</li>
+        </ol>
+
+        <h3>Flow — Profile Load</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[Profile screen open hua] --&gt; B[/users/uid se read karo/]
+    B --&gt; C[Avatar, naam, bio dikhao]
+    A --&gt; D[/userPosts/uid se postIds ki list lo/]
+    D --&gt; E[Har postId ke liye /posts/postId read karo]
+    E --&gt; F[3-column grid mein images dikhao]
+    A --&gt; G[/follows/uid/following aur /followers count nikalo/]
+    G --&gt; H[Stats row update karo: Posts / Followers / Following]
+          </pre>
+        </div>
+
+        <h3>Flow — Edit Profile</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant App as App
+    participant DB as Realtime Database
+
+    U-&gt;&gt;App: "Edit profile" tap karta hai
+    App--&gt;&gt;U: Form dikhao (bio, avatar, full name) current values ke sath
+    U-&gt;&gt;App: Changes kar ke Save tap karta hai
+    App-&gt;&gt;DB: UPDATE /users/{uid} (sirf changed fields)
+    DB--&gt;&gt;App: success
+    App--&gt;&gt;U: Profile screen pe wapas, updated data dikhao
+          </pre>
+        </div>
+
+        <h3>Flow — Apna vs. Doosre Ka Profile</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[Profile screen open hua, ek uid parameter ke sath] --&gt; B{uid == current logged-in user?}
+    B --&gt;|Haan - apna profile| C[Edit profile button dikhao]
+    B --&gt;|Nahi - doosre ka profile| D["/follows/myUid/following/otherUid check karo"]
+    D --&gt; E{Already follow karta hoon?}
+    E --&gt;|Haan| F[Button: Following]
+    E --&gt;|Nahi| G[Button: Follow]
+          </pre>
+        </div>
+
+        <h3>RTDB Data Touched</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Path</th><th>Operation</th><th>Kab</th></tr>
+            <tr><td><code>/users/{uid}</code></td><td>read</td><td>Profile screen load (apna ya doosre ka)</td></tr>
+            <tr><td><code>/userPosts/{uid}</code></td><td>read</td><td>Post grid banane ke liye</td></tr>
+            <tr><td><code>/posts/{postId}</code></td><td>read (multiple)</td><td>Grid item ki image/caption</td></tr>
+            <tr><td><code>/follows/{uid}/following</code></td><td>read (count)</td><td>Stats row</td></tr>
+            <tr><td><code>/follows/{uid}/followers</code></td><td>read (count)</td><td>Stats row</td></tr>
+            <tr><td><code>/follows/{myUid}/following/{otherUid}</code></td><td>read</td><td>Doosre ka profile — Follow button state</td></tr>
+            <tr><td><code>/users/{uid}</code></td><td>update</td><td>Edit profile save (sirf apna profile)</td></tr>
+          </table>
+        </div>
+
+        <h3>Design System Components</h3>
+        <div class="chip-row">
+          <span class="chip">Avatar</span>
+          <span class="chip">StatBlock</span>
+          <span class="chip">PrimaryButton</span>
+          <span class="chip">FollowButton</span>
+          <span class="chip">PostGridItem</span>
+          <span class="chip">BottomNavBar</span>
+        </div>
+
+        <h3>Build Checklist</h3>
+        <ul class="checklist">
+          <li>Apna vs. kisi aur ka profile — same screen, "Edit profile" sirf apne profile pe</li>
+          <li>Post grid ke liye <code>LazyVerticalGrid</code>, 3 columns</li>
+          <li>Avatar upload — same R2 + Worker pattern jo Create Post mein hai</li>
+          <li>Stats count real-time nahi chahiye — ek baar load karna kaafi hai</li>
+          <li>Edit Profile mein partial update use karo (<code>updateChildren</code>), poora object overwrite mat karo</li>
+        </ul>
+
+        <h3>Edge Cases</h3>
+        <ul class="plain">
+          <li>Naya account, posts nahi → empty grid state ("No posts yet")</li>
+          <li>Bio empty ho sakti hai — graceful handle karo</li>
+          <li>Dusre ka profile → Follow/Following button, Edit profile nahi</li>
+          <li>Avatar upload fail ho to bio/naam ka save alag se chalne do</li>
+          <li>Khud apna profile khud follow nahi kar sakta — Follow button khud ke profile pe kabhi nahi dikhna chahiye</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="feature-create-post">
+        <span class="eyebrow">Feature 3</span>
+        <h2>Create Post</h2>
+        <p>Sabse "heavy" feature — image upload + 2 alag storage systems (Cloudflare R2 file ke liye, Firebase RTDB data ke liye) connect hote hain.</p>
+
+        <div class="callout warning">
+          <strong>MVP scope note</strong>
+          "Add location", "Tag people", aur "Advanced settings" Stitch design mein hain but <a href="#features-overview">v2 ke liye deferred</a> hain.
+        </div>
+
+        <h3>Flow — Full Upload</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant App as Android App
+    participant W as Cloudflare Worker
+    participant R2 as Cloudflare R2
+    participant DB as Realtime Database
+
+    U-&gt;&gt;App: Android Photo Picker se image chunta hai
+    App-&gt;&gt;App: Image compress karo (size kam karne ke liye)
+    U-&gt;&gt;App: Caption likhta hai, "Share" tap karta hai
+    App-&gt;&gt;W: POST /get-upload-url (auth token ke sath)
+    W--&gt;&gt;App: presigned upload URL (temporary, ~few minutes valid)
+    App-&gt;&gt;R2: PUT image bytes seedha presigned URL pe
+    Note over App,R2: Progress bar yahan se update hoti hai (upload %)
+    R2--&gt;&gt;App: 200 OK
+    App-&gt;&gt;App: Final image URL banao (R2 CDN URL pattern se)
+    App-&gt;&gt;DB: SET /posts/{postId} = {uid, imageUrl, caption, createdAt, likeCount:0}
+    App-&gt;&gt;DB: SET /userPosts/{uid}/{postId} = true
+    App-&gt;&gt;DB: SET /feedPosts/{postId} = {uid, createdAt}
+    DB--&gt;&gt;App: success
+    App--&gt;&gt;U: Navigate to Home Feed, naya post sabse upar
+          </pre>
+        </div>
+
+        <h3>Flow — Error Handling</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[Upload shuru] --&gt; B{Network available?}
+    B --&gt;|Nahi| C[Error: "No internet, try again" + Retry button]
+    B --&gt;|Haan| D{Worker se presigned URL mila?}
+    D --&gt;|Nahi| C
+    D --&gt;|Haan| E{R2 upload successful?}
+    E --&gt;|Nahi| C
+    E --&gt;|Haan| F{RTDB write successful?}
+    F --&gt;|Nahi| G["Image R2 pe hai but post record nahi bana — retry RTDB write only"]
+    F --&gt;|Haan| H[Success - Feed pe navigate karo]
+          </pre>
+        </div>
+
+        <h3>RTDB Data Touched</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Path</th><th>Operation</th><th>Kab</th></tr>
+            <tr><td><code>/posts/{postId}</code></td><td>write</td><td>Upload success ke baad</td></tr>
+            <tr><td><code>/userPosts/{uid}/{postId}</code></td><td>write</td><td>Upload success ke baad</td></tr>
+            <tr><td><code>/feedPosts/{postId}</code></td><td>write</td><td>Upload success ke baad</td></tr>
+          </table>
+        </div>
+
+        <h3>External Calls</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Call</th><th>Kya karta hai</th></tr>
+            <tr><td><code>POST /get-upload-url</code></td><td>Presigned upload URL deta hai (R2 secret Worker mein hai, app mein nahi)</td></tr>
+            <tr><td><code>PUT &lt;presigned-url&gt;</code></td><td>Actual image bytes R2 pe upload karta hai</td></tr>
+          </table>
+        </div>
+
+        <h3>Design System Components</h3>
+        <div class="chip-row">
+          <span class="chip">PrimaryButton</span>
+          <span class="chip">TextField</span>
+          <span class="chip">ProgressBar</span>
+          <span class="chip">ImagePreview</span>
+        </div>
+
+        <h3>Build Checklist</h3>
+        <ul class="checklist">
+          <li>Android Photo Picker integrate karo (<code>ActivityResultContracts.PickVisualMedia</code>)</li>
+          <li>Image compress karo upload se pehle (max 1080px width, JPEG ~80%)</li>
+          <li>Cloudflare Worker banao jo authenticated request pe presigned URL de (Firebase ID token verify karo)</li>
+          <li>Upload progress ke liye OkHttp/Retrofit ka progress-tracking request body</li>
+          <li>Teeno RTDB writes ek sath — beech mein fail ho to retry logic socho</li>
+        </ul>
+
+        <h3>Edge Cases</h3>
+        <ul class="plain">
+          <li>Bohat badi image (camera se 10MB+) → compression zaroori</li>
+          <li>App background mein jaye upload ke dauran → MVP ke liye cancel acceptable, WorkManager v2 mein</li>
+          <li>Double-tap guard Share button pe</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="feature-feed">
+        <span class="eyebrow">Feature 4</span>
+        <h2>Home Feed</h2>
+        <p>App khulte hi sabse pehla screen — sab posts, newest sabse upar.</p>
+
+        <h3>Flow — Feed Load</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[Home Feed screen open] --&gt; B["/feedPosts orderByChild(createdAt) limitToLast(20)"]
+    B --&gt; C[postId + uid + createdAt ki list mili]
+    C --&gt; D[Har postId ke liye /posts/postId read karo]
+    D --&gt; E[Har uid ke liye /users/uid read karo - username/avatar ke liye]
+    E --&gt; F[PostCard list render karo, LazyColumn mein]
+    F --&gt; G{User neeche scroll kare?}
+    G --&gt;|Haan| H[Next 20 posts load karo - pagination]
+    G --&gt;|Nahi| F
+          </pre>
+        </div>
+
+        <h3>Flow — Like a Post</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant App as App
+    participant DB as Realtime Database
+
+    U-&gt;&gt;App: Like icon tap karta hai
+    App-&gt;&gt;DB: Transaction: /posts/{postId}/likeCount + 1
+    DB--&gt;&gt;App: updated count
+    App--&gt;&gt;U: Icon filled ho jata hai, count update
+    App-&gt;&gt;DB: IF post owner != current user: write /notifications/{postOwnerUid}/{notifId}
+    Note over App,DB: type: "like", fromUid: currentUser, postId, read: false
+          </pre>
+        </div>
+
+        <h3>RTDB Data Touched</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Path</th><th>Operation</th><th>Kab</th></tr>
+            <tr><td><code>/feedPosts</code></td><td>read (ordered, limited)</td><td>Feed load + pagination</td></tr>
+            <tr><td><code>/posts/{postId}</code></td><td>read</td><td>Har post ki detail</td></tr>
+            <tr><td><code>/users/{uid}</code></td><td>read</td><td>Author ka username/avatar</td></tr>
+            <tr><td><code>/posts/{postId}/likeCount</code></td><td>transaction (increment)</td><td>Like tap</td></tr>
+            <tr><td><code>/notifications/{postOwnerUid}/{notifId}</code></td><td>write</td><td>Like/comment hone par owner ko notify</td></tr>
+          </table>
+        </div>
+
+        <h3>Design System Components</h3>
+        <div class="chip-row">
+          <span class="chip">PostCard</span>
+          <span class="chip">Avatar</span>
+          <span class="chip">LikeButton</span>
+          <span class="chip">BottomNavBar</span>
+        </div>
+
+        <h3>Build Checklist</h3>
+        <ul class="checklist">
+          <li><code>LazyColumn</code> + <code>ValueEventListener</code>/<code>addChildEventListener</code> — real-time updates</li>
+          <li>Pagination: <code>limitToLast</code> + pehle item ke timestamp se agla batch</li>
+          <li>Like button optimistic update, phir backend confirm</li>
+          <li>N+1 read problem se bacho — batch reads jahan mumkin ho</li>
+        </ul>
+
+        <h3>Edge Cases</h3>
+        <ul class="plain">
+          <li>Post delete ho jaye lekin <code>/feedPosts</code> mein reference reh jaye → null-check</li>
+          <li>Khud ke post ko like karne par khud ko notification mat bhejo</li>
+          <li>Feed khali ho — empty state handle karo</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="feature-search">
+        <span class="eyebrow">Feature 5</span>
+        <h2>Search</h2>
+        <p>Username se doosre users dhoondna aur seedha wahin se follow karna.</p>
+
+        <h3>Flow — Search</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[User search box mein type karta hai] --&gt; B[Debounce ~300ms]
+    B --&gt; C["/usernames orderByKey().startAt(query).endAt(query + uf8ff)"]
+    C --&gt; D[Matching username: uid pairs mile]
+    D --&gt; E[Har uid ke liye /users/uid read karo - avatar, full name]
+    E --&gt; F[List render karo with Follow button]
+          </pre>
+        </div>
+
+        <h3>Flow — Follow from Search</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant App as App
+    participant DB as Realtime Database
+
+    U-&gt;&gt;App: "Follow" button tap karta hai (kisi user X pe)
+    App-&gt;&gt;DB: SET /follows/{me}/following/{X} = true
+    App-&gt;&gt;DB: SET /follows/{X}/followers/{me} = true
+    App-&gt;&gt;DB: write /notifications/{X}/{notifId} = {type:"follow", fromUid: me, read:false}
+    DB--&gt;&gt;App: success
+    App--&gt;&gt;U: Button "Following" mein badal jata hai
+          </pre>
+        </div>
+
+        <h3>RTDB Data Touched</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Path</th><th>Operation</th><th>Kab</th></tr>
+            <tr><td><code>/usernames</code></td><td>read (range query)</td><td>Har search keystroke (debounced)</td></tr>
+            <tr><td><code>/users/{uid}</code></td><td>read (multiple)</td><td>Result details</td></tr>
+            <tr><td><code>/follows/{me}/following/{X}</code></td><td>write</td><td>Follow tap</td></tr>
+            <tr><td><code>/follows/{X}/followers/{me}</code></td><td>write</td><td>Follow tap (dono taraf se)</td></tr>
+            <tr><td><code>/notifications/{X}/{notifId}</code></td><td>write</td><td>Follow hone par doosre ko batana</td></tr>
+          </table>
+        </div>
+
+        <h3>Design System Components</h3>
+        <div class="chip-row">
+          <span class="chip">SearchBar</span>
+          <span class="chip">ListRow</span>
+          <span class="chip">FollowButton</span>
+        </div>
+
+        <h3>Build Checklist</h3>
+        <ul class="checklist">
+          <li>Search input pe debounce — har keystroke pe query mat chalao</li>
+          <li>Username lowercase store karo — case-insensitive search ke liye</li>
+          <li>Follow button optimistic toggle, phir background confirm</li>
+          <li>Khud ko search results mein mat dikhao</li>
+        </ul>
+
+        <h3>Edge Cases</h3>
+        <ul class="plain">
+          <li>Empty search box → koi results mat dikhao</li>
+          <li>Already-followed user → button "Following" se shuru</li>
+          <li>Username mein <code>. # $ [ ]</code> allowed nahi — signup pe hi validate karo (dekho <a href="#feature-auth">Users &amp; Auth</a>)</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="feature-notifications">
+        <span class="eyebrow">Feature 6</span>
+        <h2>Notifications</h2>
+        <p>Real-time list — like/comment/follow hone par yahan dikhega. MVP mein sirf in-app list, push (FCM) nahi.</p>
+
+        <h3>Flow — Receiving</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+sequenceDiagram
+    participant Other as Doosra User
+    participant DB as Realtime Database
+    participant App as Meri App (listener attached)
+    participant Me as Main
+
+    Other-&gt;&gt;DB: Like/Comment/Follow action karta hai
+    DB-&gt;&gt;DB: write /notifications/{myUid}/{notifId}
+    Note over DB,App: ValueEventListener already attached hai /notifications/{myUid} pe
+    DB--&gt;&gt;App: onDataChange fire hota hai (real-time push)
+    App-&gt;&gt;Me: List turant update ho jati hai, naya item sabse upar
+          </pre>
+        </div>
+
+        <h3>Flow — Screen Logic</h3>
+        <div class="diagram-card">
+          <pre class="mermaid">
+flowchart TD
+    A[Notifications screen open] --&gt; B["/notifications/myUid pe ValueEventListener lagao"]
+    B --&gt; C[Har notification ka 'type' check karo]
+    C --&gt;|like| D[Icon: heart, Text: 'X liked your post', thumbnail: post image]
+    C --&gt;|comment| E[Icon: comment, Text: 'X commented: ...', thumbnail: post image]
+    C --&gt;|follow| F[Icon: person, Text: 'X started following you', 'Follow back' button]
+    D --&gt; G[Tap karne par us post pe navigate karo]
+    E --&gt; G
+    F --&gt; H["Follow back tap -&gt; /follows write"]
+          </pre>
+        </div>
+
+        <h3>RTDB Data Touched</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <tr><th>Path</th><th>Operation</th><th>Kab</th></tr>
+            <tr><td><code>/notifications/{myUid}</code></td><td>real-time read (listener)</td><td>Screen open rehte waqt hamesha</td></tr>
+            <tr><td><code>/notifications/{myUid}/{notifId}/read</code></td><td>update</td><td>Notification tap (read=true)</td></tr>
+            <tr><td><code>/follows/...</code></td><td>write</td><td>"Follow back" tap (dekho <a href="#feature-search">Search</a>)</td></tr>
+          </table>
+        </div>
+
+        <h3>Design System Components</h3>
+        <div class="chip-row">
+          <span class="chip">ListRow</span>
+          <span class="chip">FollowButton</span>
+          <span class="chip">NotificationIcon</span>
+          <span class="chip">BottomNavBar</span>
+        </div>
+
+        <h3>Build Checklist</h3>
+        <ul class="checklist">
+          <li><code>ValueEventListener</code> ya Kotlin Flow (<code>callbackFlow</code>) se real-time observe</li>
+          <li>Listener detach karna mat bhoolna screen leave karte waqt</li>
+          <li>Type ke hisab se alag UI — sealed class <code>NotificationType</code></li>
+          <li>Unread count badge bottom nav pe (optional polish)</li>
+        </ul>
+
+        <h3>Edge Cases</h3>
+        <ul class="plain">
+          <li>Post delete ho jaye, purani notification reh jaye → graceful handle</li>
+          <li>Bohat purani notifications → <code>limitToLast(50)</code> cap</li>
+          <li>Already followed user ko dobara "Follow back" na dikhe</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Push Notifications (v2, abhi scope mein nahi)</strong>
+          Lock-screen push ke liye Firebase Cloud Messaging + ek Cloud Function chahiye hoga jo naya write hote hi trigger kare. Extra infrastructure hai, is liye MVP se bahar.
+        </div>
+      </section>
+
+      <footer class="doc-footer">
+        Last updated: 2026-10-04 — planning discussion reflect karta hai, implementation shuru nahi hui.
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('navToggle');
+  const scrim = document.getElementById('scrim');
+  function closeNav(){ sidebar.classList.remove('open'); scrim.classList.remove('show'); }
+  toggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    scrim.classList.toggle('show');
+  });
+  scrim.addEventListener('click', closeNav);
+  sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+
+  const links = Array.from(document.querySelectorAll('.sidebar a'));
+  const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = '#' + entry.target.id;
+      const link = links.find(a => a.getAttribute('href') === id);
+      if (!link) return;
+      if (entry.isIntersecting){
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px', threshold: 0 });
+  sections.forEach(s => io.observe(s));
+</script>
