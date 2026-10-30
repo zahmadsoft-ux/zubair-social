@@ -61,3 +61,27 @@ sequenceDiagram
 - Koi post delete ho jaye lekin `/feedPosts` mein reference reh jaye → load karte waqt null-check karo
 - Khud ke post ko like karne par notification khud ko mat bhejo
 - Feed khali ho (naya account, koi follow nahi) → MVP mein "everyone's posts" hai is liye khali hona rare hai, lekin empty state zaroor handle karo
+
+---
+
+## Build Prompts (Claude ko dene ke liye)
+
+### Prompt 1 — PostCard + LikeButton
+```
+ui/components mein PostCard banao: header (small Avatar + username), square image (Coil), action row (LikeButton filled/outline, comment icon), likeCount, caption, "View all N comments" link. Stateless composable ho (data + callbacks parameters mein). @Preview mein liked aur not-liked dono states do.
+```
+
+### Prompt 2 — Feed load
+```
+Home Feed screen banao: /feedPosts ko orderByChild("createdAt").limitToLast(20) se read karo, phir har postId ka /posts aur har uid ka /users read karke PostCard ki list banao (LazyColumn, newest upar). N+1 reads ko parallel karo (coroutines async). Loading, error aur empty states handle karo. Deleted post (null) skip karo.
+```
+
+### Prompt 3 — Pagination
+```
+Feed mein pagination add karo: neeche scroll karne par sabse purani loaded post ke createdAt se pehle ke agle 20 posts load ho (endBefore/endAt + limitToLast). Duplicate items na aayen, aur end of list par loading band ho.
+```
+
+### Prompt 4 — Like
+```
+Like button par optimistic update karo (icon turant filled, count +1), phir /posts/{postId}/likeCount par transaction chalao; fail ho to UI revert karo. Ek user ek post ko ek hi baar like kare (/postLikes/{postId}/{uid} use karke) aur dobara tap karne par unlike ho. Post owner ko /notifications/{ownerUid} mein "like" notification likho, lekin khud ki post ho to nahi.
+```

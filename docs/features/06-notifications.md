@@ -63,3 +63,29 @@ flowchart TD
 ---
 
 **Push Notifications (v2, abhi scope mein nahi):** Agar baad mein lock-screen push chahiye ho, to Firebase Cloud Messaging (FCM) + ek Cloud Function chahiye hoga jo `/notifications` mein naya write hote hi FCM message trigger kare. Yeh extra infrastructure hai, is liye MVP se bahar rakha gaya hai.
+
+---
+
+## Build Prompts (Claude ko dene ke liye)
+
+Yeh feature Like (Feed) aur Follow (Search) ke baad banao, warna test karne ko notifications hi nahi hongi.
+
+### Prompt 1 — Model + real-time stream
+```
+Notification ka sealed class model banao (Like, Comment, Follow) aur /notifications/{myUid} ko orderByChild("createdAt").limitToLast(50) ke saath callbackFlow se observe karne wala repository likho. awaitClose mein listener detach ho. Har notification ke fromUid ka /users aur (like/comment ke liye) post thumbnail bhi fetch karo.
+```
+
+### Prompt 2 — Notifications screen
+```
+Notifications (Activity tab) screen banao: LazyColumn mein ListRow, type ke hisab se NotificationIcon (heart/comment/person) aur text ("X liked your post", "X started following you"), newest upar. Follow type par outline FollowButton ("Follow back") — agar already follow karte ho to na dikhe. Empty state do.
+```
+
+### Prompt 3 — Read state + navigation
+```
+Notification tap par read = true update karo aur like/comment par us post par navigate karo (post delete ho chuki ho to graceful error state), follow par us user ke Profile par. Unread notifications ka halka highlight aur BottomNavBar ke Activity icon par unread count badge lagao.
+```
+
+### Prompt 4 — End-to-end test
+```
+Do accounts (ek phone, ek emulator) se test plan batao aur chalao: A ne B ki post like ki, A ne B ko follow kiya — B ki Notifications screen real-time update ho. Jo bug mile unhe list karo aur fix karo.
+```

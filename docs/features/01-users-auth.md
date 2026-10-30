@@ -167,3 +167,41 @@ flowchart TD
 - Username already taken → clear error, user ko dusra try karne do
 - App restart hone par Firebase Auth ka current user check karo (agar already logged in hai to seedha Feed pe le jao, Login screen skip karo)
 - Logout hone par `FirebaseAuth.getInstance().signOut()` call karo — iske baad agli baar app khulne par Login screen wapas dikhega
+
+---
+
+## Build Prompts (Claude ko dene ke liye)
+
+Har prompt ek chhota step hai. Ek ke baad ek do, aur har step ke baad app run karke check karo. Prompt mein hamesha batao **kya** chahiye aur **kaunse design system components** use hon, taake code consistent rahe.
+
+### Prompt 1 — Firebase connect
+```
+Zubair Social (package com.zubair.social) mein Firebase add karo: google-services plugin, Firebase BoM, firebase-auth-ktx aur firebase-database-ktx dependencies (libs.versions.toml ke through). google-services.json app/ mein maujood hai. Phir mujhe samjhao ke har dependency kya karti hai.
+```
+
+### Prompt 2 — Design system components
+```
+ui/components mein TextField (label, value, error message, password mode ke saath) aur GoogleButton (outline style) banao. Colors/spacing sirf Theme tokens (MaterialTheme.colorScheme, Spacing, Radius) se lo, hardcoded values nahi. Har component ka @Preview bhi do.
+```
+
+### Prompt 3 — Login screen
+```
+01-users-auth.md ke Login section ke mutabiq Login screen banao: email + password TextField, PrimaryButton "Log in", GoogleButton (abhi sirf UI), "Don't have an account? Sign up" link. Client-side validation (khali field), phir FirebaseAuth.signInWithEmailAndPassword. Errors ke liye table wale messages dikhao (security tip ke mutabiq wrong email/password ka generic message). ViewModel + UiState use karo.
+```
+
+### Prompt 4 — Sign up screen
+```
+Doc ke Signup section ke 11 steps follow karte hue Sign up screen banao: email, full name, username, password. Client-side validation (username 3-20 chars, sirf letters/numbers/underscore), /usernames/{username} RTDB check, createUserWithEmailAndPassword, phir /users/{uid} aur /usernames/{username} write. Failure table ke saare cases handle karo. Har step ka reason mujhe samjhao.
+```
+
+### Prompt 5 — Navigation + session check
+```
+Navigation Compose lagao: app launch pe FirebaseAuth.currentUser check karo — null ho to Login, warna Home (abhi placeholder screen). Login/Sign up success pe Home, aur Home pe ek Logout button jo signOut() kare. Back stack aisa ho ke Home se back dabane par Login na khule.
+```
+
+### Prompt 6 — Firebase Security Rules
+```
+RTDB ke liye security rules likho: /users/{uid} sirf owner write kare, sab authenticated users read kar saken; /usernames/{username} sirf tab write ho jab pehle se na ho. Rules samjhao aur mujhe batao console mein kahan paste karne hain.
+```
+
+> **Tip:** Agar koi step fail ho to error ka pura text prompt ke saath paste karo — sirf "kaam nahi kar raha" likhne se Claude ko andaza lagana padta hai.

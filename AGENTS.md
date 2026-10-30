@@ -27,3 +27,7 @@ Hamesha **ADB over WiFi** se connected device par build karke install/update kar
 - `adb uninstall` ya `adb shell pm clear` kabhi mat chalao bina user ki ijazat ke (app data delete hota hai).
 - `local.properties` machine-specific hai (SDK path), commit nahi hota.
 - Build verify karne ke liye: `./gradlew assembleDebug`.
+
+## Language
+- **App ka UI text (labels, buttons, error messages, placeholders) hamesha English mein.** Roman Urdu sirf docs/comments/chat mein.
+- Docs ki error tables Roman Urdu mein hain, lekin code mein unka English version likho.

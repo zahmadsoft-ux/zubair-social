@@ -148,3 +148,36 @@ flowchart TD
 - Dusre ka profile dekh rahe ho to "Follow"/"Following" button dikhao, "Edit profile" nahi
 - Edit Profile mein avatar change ho raha ho aur upload beech mein fail ho jaye → bio/naam ka save alag se chalne do, sirf avatar ka part fail mark karo
 - Khud apna profile khud follow nahi kar sakta — "Follow" button khud ke profile pe kabhi nahi dikhna chahiye
+
+---
+
+## Build Prompts (Claude ko dene ke liye)
+
+Pehle [01-users-auth.md](01-users-auth.md) ke prompts complete hone chahiye (login ke baad `uid` chahiye). Har prompt ke baad app run karke check karo.
+
+### Prompt 1 — Core components
+```
+ui/components mein Avatar (small aur large size, imageUrl null ho to initials ya placeholder), StatBlock (number + label), SecondaryButton (outline) aur PostGridItem (square thumbnail, Coil se image) banao. Sirf Theme tokens use karo, har component ka @Preview do.
+```
+
+### Prompt 2 — BottomNavBar + navigation
+```
+5 tabs wali BottomNavBar banao (Home, Search, Create, Activity, Profile) design system component ki tarah, aur Navigation Compose mein wire karo. Abhi Home/Search/Create/Activity placeholder screens hon, Profile tab asli screen par jaye. Active tab ka state highlight ho.
+```
+
+### Prompt 3 — Profile screen (read-only)
+```
+Profile screen banao jo uid parameter leta ho. Doc ke "Profile Load" ke steps follow karo: /users/{uid}, /userPosts/{uid}, /posts/{postId}, /follows count read karo. ViewModel + UiState (Loading / Success / Error) use karo. Header (Avatar, naam, bio), stats row, LazyVerticalGrid 3 columns, loading skeleton aur empty state ("Abhi tak koi post nahi") sab handle karo.
+```
+
+### Prompt 4 — Own vs. others
+```
+Profile screen mein isOwnProfile = (uid == currentUser.uid) se decide karo: apna ho to "Edit profile" button, doosre ka ho to FollowButton (/follows/{me}/following/{other} check karke Follow/Following state). Khud ke profile par Follow kabhi na dikhe.
+```
+
+### Prompt 5 — Edit profile
+```
+Edit Profile screen banao: full name, bio (150 char limit counter ke saath), avatar (abhi sirf Photo Picker se select + preview, upload Create Post feature ke baad jodenge). Save par updateChildren se sirf changed fields update karo. Fail hone par form band na ho aur error dikhe. Save ke baad Profile par wapas aakar updated data dikhe.
+```
+
+> **Note:** Avatar ka asli upload [03-create-post.md](03-create-post.md) ka R2 + Worker setup ban jane ke baad jodo.

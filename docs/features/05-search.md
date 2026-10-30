@@ -57,3 +57,27 @@ sequenceDiagram
 - Empty search box → koi results mat dikhao (ya recent/suggested users — v2 feature)
 - Already-followed user dikhe to button "Following" se shuru ho, "Follow" se nahi
 - Username mein special characters RTDB path mein allowed nahi hote (`.` `#` `$` `[` `]`) — signup ke waqt hi validate karna zaroori hai (dekho [01-users-auth.md](01-users-auth.md))
+
+---
+
+## Build Prompts (Claude ko dene ke liye)
+
+### Prompt 1 — Components
+```
+ui/components mein SearchBar, ListRow (leading Avatar, title, subtitle, trailing slot — Search aur Notifications dono mein use hoga) aur FollowButton (filled "Follow" ↔ outline "Following", loading state) banao. Theme tokens use karo, @Preview do.
+```
+
+### Prompt 2 — Search
+```
+Search screen banao: SearchBar mein type karne par 300ms debounce (Flow.debounce), phir /usernames par orderByKey().startAt(q).endAt(q + "") query, har uid ka /users read, ListRow mein dikhao. Query lowercase karo. Khud ko results se hatao. Empty query par kuch na dikhao, no-results par message dikhao.
+```
+
+### Prompt 3 — Follow / Unfollow
+```
+FollowButton ko wire karo: tap par optimistic toggle, phir /follows/{me}/following/{X} aur /follows/{X}/followers/{me} ek hi multi-path update mein likho; Follow par /notifications/{X} mein "follow" notification bhi. Unfollow par dono follows hatao. Search results ke saath already-followed state pehle se sahi dikhe. Fail par UI revert karo.
+```
+
+### Prompt 4 — Result se profile
+```
+Search result row tap karne par us user ka Profile screen khule (uid parameter ke saath, 02-profile.md ka own-vs-others logic). Back dabane par search query aur results waise hi rahen.
+```

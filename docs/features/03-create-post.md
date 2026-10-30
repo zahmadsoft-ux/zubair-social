@@ -80,3 +80,34 @@ flowchart TD
 - Bohat badi image (phone camera se 10MB+ ho sakti hai) → compression zaroori hai
 - App background mein chali jaye upload ke dauran → abhi MVP ke liye "upload cancel ho jaye" acceptable hai (background-safe upload WorkManager se v2 mein)
 - Same image do baar accidentally share na ho (double-tap guard on Share button)
+
+---
+
+## Build Prompts (Claude ko dene ke liye)
+
+Is feature mein do hisse hain: pehle Cloudflare Worker (backend), phir Android. Worker pehle banao, kyunke app usi par depend karti hai.
+
+### Prompt 1 — Cloudflare Worker (presigned URL)
+```
+Cloudflare Worker (TypeScript, wrangler) likho jo POST /get-upload-url par Firebase ID token verify kare (Authorization: Bearer header), phir R2 bucket ke liye ek unique key (posts/{uid}/{timestamp}.jpg) ka presigned PUT URL aur final public imageUrl return kare. R2 keys sirf Worker secrets mein hon. Deploy ke steps aur ek curl test command bhi do. Har step samjhao.
+```
+
+### Prompt 2 — Photo Picker + preview
+```
+Create tab ki screen banao: Android Photo Picker (ActivityResultContracts.PickVisualMedia) se image select karo, ImagePreview component (Change option ke saath), caption TextField (multi-line, 0/2200 counter), PrimaryButton "Share" jo image ke baghair disabled ho. ViewModel mein state rakho.
+```
+
+### Prompt 3 — Image compress
+```
+Upload se pehle image ko max 1080px width par resize aur JPEG quality 80 par compress karne ka helper likho (background thread par). Before/after size log karo taake mujhe farq dikhe.
+```
+
+### Prompt 4 — Upload with progress
+```
+OkHttp se presigned URL par PUT upload karo, progress-tracking RequestBody ke saath, aur "Uploading" screen par ProgressBar (0-100%) dikhao. Worker se URL lene ke liye Firebase ID token bhejo. Share button ka double-tap guard lagao.
+```
+
+### Prompt 5 — RTDB writes + errors
+```
+Upload success ke baad /posts/{postId}, /userPosts/{uid}/{postId} aur /feedPosts/{postId} teeno ko ek hi multi-path updateChildren se atomically likho. Flow diagram ke error handling ke mutabiq: internet nahi / URL nahi mila / upload fail → Retry button; sirf RTDB write fail ho to upload dobara kiye baghair sirf RTDB write retry ho. Success par Home Feed par navigate karo.
+```
