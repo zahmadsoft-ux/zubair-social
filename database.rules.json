@@ -5,7 +5,10 @@
     "users": {
       ".read": "auth != null",
       "$uid": {
-        ".write": "auth != null && auth.uid === $uid"
+        ".write": "auth != null && auth.uid === $uid",
+        "bio": {
+          ".validate": "newData.isString() && newData.val().length <= 150"
+        }
       }
     },
     "usernames": {
@@ -14,6 +17,15 @@
         ".read": true,
         ".write": "auth != null && !data.exists() && newData.val() === auth.uid"
       }
+    },
+    "userPosts": {
+      ".read": "auth != null"
+    },
+    "posts": {
+      ".read": "auth != null"
+    },
+    "follows": {
+      ".read": "auth != null"
     }
   }
 }

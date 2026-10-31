@@ -3,6 +3,7 @@ package com.zubair.social.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -17,11 +18,14 @@ import com.zubair.social.ui.auth.SignUpScreen
 import com.zubair.social.ui.common.PlaceholderScreen
 import com.zubair.social.ui.components.BottomNavBar
 import com.zubair.social.ui.components.NavTab
+import com.zubair.social.ui.profile.EditProfileScreen
 import com.zubair.social.ui.profile.ProfileScreen
 
 object Routes {
     const val Login = "login"
     const val SignUp = "signup"
+    const val EditProfile = "edit_profile"   // tab nahi, isliye bottom bar yahan nahi dikhti
+    const val ProfileUpdatedKey = "profile_updated"
 }
 
 /** Har tab ka route. Tab -> route mapping yahan, taake BottomNavBar component navigation se alag rahe. */
@@ -82,11 +86,32 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             composable(NavTab.Search.route()) { PlaceholderScreen("Search") }
             composable(NavTab.Create.route()) { PlaceholderScreen("Create") }
             composable(NavTab.Activity.route()) { PlaceholderScreen("Activity") }
-            composable(NavTab.Profile.route()) {
-                ProfileScreen(onLogout = {
-                    FirebaseAuth.getInstance().signOut()
-                    navController.goLogin()
-                })
+            composable(Routes.EditProfile) {
+                EditProfileScreen(
+                    onBack = { navController.popBackStack() },
+                    onSaved = {
+                        // Profile ko batao ke data badla hai, phir wapas jao.
+                        navController.previousBackStackEntry?.savedStateHandle?.set(Routes.ProfileUpdatedKey, true)
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable(NavTab.Profile.route()) { entry ->
+                val updated by entry.savedStateHandle.getStateFlow(Routes.ProfileUpdatedKey, false).collectAsState()
+                // Tab = apna profile, isliye uid current user ka.
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                if (uid != null) {
+                    ProfileScreen(
+                        uid = uid,
+                        onLogout = {
+                            FirebaseAuth.getInstance().signOut()
+                            navController.goLogin()
+                        },
+                        onEditProfile = { navController.navigate(Routes.EditProfile) },
+                        profileUpdated = updated,
+                        onUpdateHandled = { entry.savedStateHandle[Routes.ProfileUpdatedKey] = false },
+                    )
+                }
             }
         }
     }

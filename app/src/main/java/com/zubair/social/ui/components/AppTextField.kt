@@ -39,6 +39,8 @@ fun AppTextField(
     helperText: String? = null,
     isPassword: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
 ) {
     // Show/Hide ka state sirf is component ka apna hai, bahar wale ko iski zarurat nahi.
     var passwordVisible by remember { mutableStateOf(false) }
@@ -49,7 +51,8 @@ fun AppTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
-            singleLine = true,
+            singleLine = singleLine,
+            minLines = minLines,
             isError = errorMessage != null,
             shape = RoundedCornerShape(Radius.md),
             visualTransformation = if (hidden) PasswordVisualTransformation() else VisualTransformation.None,
