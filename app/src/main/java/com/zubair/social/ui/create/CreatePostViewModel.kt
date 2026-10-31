@@ -54,7 +54,9 @@ data class CreatePostUiState(
         get() = upload !is UploadState.Idle
 }
 
-class CreatePostViewModel(
+// @JvmOverloads: Android ka default ViewModel factory sirf (Application) constructor dhoondta hai;
+// iske bina defaults wale extra parameters ke saath "Cannot create an instance" crash hota hai.
+class CreatePostViewModel @JvmOverloads constructor(
     application: Application,
     private val uploadService: UploadService = UploadService(),
     private val postRepository: PostRepository = FirebasePostRepository(),
