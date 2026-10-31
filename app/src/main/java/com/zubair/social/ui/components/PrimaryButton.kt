@@ -36,3 +36,9 @@ fun PrimaryButton(
 private fun PrimaryButtonPreview() {
     ZubairSocialTheme { PrimaryButton(text = "Log in", onClick = {}) }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun PrimaryButtonDisabledPreview() {
+    ZubairSocialTheme { PrimaryButton(text = "Logging in...", onClick = {}, enabled = false) }
+}

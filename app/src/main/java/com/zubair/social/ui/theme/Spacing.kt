@@ -19,4 +19,7 @@ object Radius {
 
 object Size {
     val control = 52.dp   // button / text field ki height
+    val avatarSmall = 40.dp
+    val avatarLarge = 96.dp
+    val stroke = 1.dp     // outline border ki motai
 }

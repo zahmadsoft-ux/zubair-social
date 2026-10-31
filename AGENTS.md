@@ -28,6 +28,16 @@ Hamesha **ADB over WiFi** se connected device par build karke install/update kar
 - `local.properties` machine-specific hai (SDK path), commit nahi hota.
 - Build verify karne ke liye: `./gradlew assembleDebug`.
 
+## Compose Previews (zaroori)
+Har naya composable (component ya screen) ke saath **usi file mein** `@Preview` hona chahiye. Bina preview ke kaam complete nahi.
+- Preview `private fun XyzPreview()` ho, `@Preview(showBackground = true)` + `@Composable`, aur `ZubairSocialTheme { ... }` mein wrapped.
+- Component: har important state ka preview — default, disabled, error, loading (jo lagu ho). Ek se zyada states ho to alag `@Preview` functions, ya ek preview mein Column.
+- Screen: stateful `XyzScreen` (ViewModel/Firebase wala) ko preview nahi kar sakte, isliye UI ko stateless `XyzContent(state, callbacks)` mein alag rakho aur uska preview banao. Kam az kam default aur error/loading state.
+- Dark mode check ke liye naye screens/components par `@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark")` bhi lagao.
+- Preview mein Firebase, ViewModel ya network use mat karo; sample data hardcode karo (UI text English mein).
+- Naya component/screen add karte waqt purani files bhi dekho: agar kisi mein preview missing ho to saath mein add karo.
+- Verify: `./gradlew assembleDebug` pass hona chahiye.
+
 ## Language
 - **App ka UI text (labels, buttons, error messages, placeholders) hamesha English mein.** Roman Urdu sirf docs/comments/chat mein.
 - Docs ki error tables Roman Urdu mein hain, lekin code mein unka English version likho.

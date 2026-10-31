@@ -110,7 +110,7 @@ class FirebaseAuthRepository(
         else -> SignUpError.Unknown
     }
 
-    private companion object {
+    companion object {
         const val DATABASE_URL = "https://zubair-social-default-rtdb.firebaseio.com"
     }
 }

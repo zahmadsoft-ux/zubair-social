@@ -1,5 +1,6 @@
 package com.zubair.social.ui.auth
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -119,5 +120,21 @@ private fun LoginErrorPreview() {
             LoginUiState(email = "zubair@example.com", password = "x", formError = "Incorrect email or password"),
             {}, {}, {}, {}, {},
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginLoadingPreview() {
+    ZubairSocialTheme {
+        LoginContent(LoginUiState(email = "zubair@example.com", password = "secret123", isLoading = true), {}, {}, {}, {}, {})
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark")
+@Composable
+private fun LoginDarkPreview() {
+    ZubairSocialTheme(darkTheme = true) {
+        LoginContent(LoginUiState(email = "zubair@example.com"), {}, {}, {}, {}, {})
     }
 }
