@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.zubair.social.ui.auth.LoginScreen
 import com.zubair.social.ui.auth.SignUpScreen
 import com.zubair.social.ui.common.PlaceholderScreen
+import com.zubair.social.ui.create.CreatePostScreen
 import com.zubair.social.ui.components.BottomNavBar
 import com.zubair.social.ui.components.NavTab
 import com.zubair.social.ui.profile.EditProfileScreen
@@ -30,6 +31,13 @@ object Routes {
 
 /** Har tab ka route. Tab -> route mapping yahan, taake BottomNavBar component navigation se alag rahe. */
 private fun NavTab.route() = name.lowercase()
+
+/** Tabs ke beech jaana: stack lamba nahi hota (Home tak pop), har tab ki state save/restore. */
+private fun NavHostController.navigateToTab(tab: NavTab) = navigate(tab.route()) {
+    popUpTo(NavTab.Home.route()) { saveState = true }
+    launchSingleTop = true
+    restoreState = true
+}
 
 /** Login/SignUp se Home: auth screens back stack se hata do, taake back par wapas na aayein. */
 private fun NavHostController.goHome() = navigate(NavTab.Home.route()) {
@@ -58,14 +66,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         // Bottom bar sirf tab screens par; Login/SignUp par nahi.
         bottomBar = {
             if (selectedTab != null) {
-                BottomNavBar(selected = selectedTab, onSelect = { tab ->
-                    navController.navigate(tab.route()) {
-                        // Tabs ke beech jaate hue stack lamba na ho: Home tak pop, har tab ki state save/restore.
-                        popUpTo(NavTab.Home.route()) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                })
+                BottomNavBar(selected = selectedTab, onSelect = navController::navigateToTab)
             }
         },
     ) { innerPadding ->
@@ -84,7 +85,9 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             }
             composable(NavTab.Home.route()) { PlaceholderScreen("Home") }
             composable(NavTab.Search.route()) { PlaceholderScreen("Search") }
-            composable(NavTab.Create.route()) { PlaceholderScreen("Create") }
+            composable(NavTab.Create.route()) {
+                CreatePostScreen(onPostCreated = { navController.navigateToTab(NavTab.Home) })
+            }
             composable(NavTab.Activity.route()) { PlaceholderScreen("Activity") }
             composable(Routes.EditProfile) {
                 EditProfileScreen(

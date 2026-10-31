@@ -69,6 +69,11 @@ fun ProfileScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    // Tab par wapas aane par (naya post bana ho sakta hai) chupke se reload; pehli baar init ka load chal raha hota hai.
+    LaunchedEffect(Unit) {
+        if (viewModel.state.value !is ProfileUiState.Loading) viewModel.refresh()
+    }
+
     LaunchedEffect(profileUpdated) {
         if (profileUpdated) {
             viewModel.refresh()

@@ -7,7 +7,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
+import java.io.IOException
 
 data class UserProfile(
     val username: String,
@@ -94,9 +95,11 @@ class FirebaseProfileRepository(
     override suspend fun updateProfile(uid: String, changes: Map<String, Any>) {
         // RTDB offline hone par write queue mein chala jata hai aur await() kabhi khatam nahi hota,
         // isliye timeout lagaya: form ko "fail" dikha sakein.
-        withTimeout(WRITE_TIMEOUT_MS) {
+        // withTimeout ki timeout CancellationException hoti hai (callers usay rethrow kar dete hain),
+        // isliye withTimeoutOrNull + IOException: caller ko asli "fail" mile.
+        withTimeoutOrNull(WRITE_TIMEOUT_MS) {
             db.getReference("users/$uid").updateChildren(changes).await()
-        }
+        } ?: throw IOException("Timed out saving profile")
     }
 
     private fun DataSnapshot.toUserProfile() = UserProfile(

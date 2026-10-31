@@ -19,13 +19,29 @@
       }
     },
     "userPosts": {
-      ".read": "auth != null"
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
     },
     "posts": {
-      ".read": "auth != null"
+      ".read": "auth != null",
+      "$postId": {
+        ".write": "auth != null && newData.child('uid').val() === auth.uid && (!data.exists() || data.child('uid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['uid','imageUrl','createdAt'])",
+        "caption": {
+          ".validate": "newData.isString() && newData.val().length <= 2200"
+        }
+      }
     },
     "follows": {
       ".read": "auth != null"
+    },
+    "feedPosts": {
+      ".read": "auth != null",
+      "$postId": {
+        ".write": "auth != null && newData.child('uid').val() === auth.uid && (!data.exists() || data.child('uid').val() === auth.uid)"
+      }
     }
   }
 }

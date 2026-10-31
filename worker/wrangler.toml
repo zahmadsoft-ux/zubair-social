@@ -1,0 +1,14 @@
+name = "zubair-social-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Yeh values secret nahi hain (koi bhi inhein dekh sakta hai), isliye yahan commit hoti hain.
+# R2_ACCOUNT_ID aur PUBLIC_BASE_URL apni values se badlo (README ke Step 1-2 dekho).
+[vars]
+FIREBASE_PROJECT_ID = "zubair-social"
+R2_ACCOUNT_ID = "REPLACE_WITH_CLOUDFLARE_ACCOUNT_ID"
+R2_BUCKET = "zubair-social-images"
+PUBLIC_BASE_URL = "https://REPLACE-WITH-YOUR-BUCKET-PUBLIC-URL"
+
+# SECRETS yahan nahi hain. Woh `wrangler secret put` se jate hain:
+#   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY

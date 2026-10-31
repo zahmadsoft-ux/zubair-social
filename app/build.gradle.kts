@@ -16,6 +16,12 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+        // Worker ka URL (secret nahi). gradle.properties mein `uploadWorkerUrl=` set karo; deploy ke baad asli URL.
+        buildConfigField(
+            "String", "UPLOAD_WORKER_URL",
+            "\"${providers.gradleProperty("uploadWorkerUrl").getOrElse("https://zubair-social-worker.REPLACE.workers.dev")}\""
+        )
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -33,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -42,6 +49,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.exifinterface)
+    implementation(libs.okhttp)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(platform(libs.androidx.compose.bom))
@@ -55,4 +64,9 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.kotlinx.coroutines.play.services)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    testImplementation(libs.junit)
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.org.json)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
 }
