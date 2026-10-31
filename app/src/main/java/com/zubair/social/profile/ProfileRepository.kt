@@ -99,6 +99,7 @@ class FirebaseProfileRepository(
         // isliye withTimeoutOrNull + IOException: caller ko asli "fail" mile.
         withTimeoutOrNull(WRITE_TIMEOUT_MS) {
             db.getReference("users/$uid").updateChildren(changes).await()
+            true   // await() ka result null hota hai; true na ho to success bhi timeout lagta hai
         } ?: throw IOException("Timed out saving profile")
     }
 

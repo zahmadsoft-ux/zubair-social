@@ -40,8 +40,11 @@ class FirebasePostRepository(
     override suspend fun publish(postId: String, uid: String, imageUrl: String, caption: String) {
         val updates = PostPaths.updates(postId, uid, imageUrl, caption, ServerValue.TIMESTAMP)
         // Offline write RTDB queue kar leta hai aur await() ruka rehta hai: timeout par fail dikhao.
+        // Task<Void>.await() ka result null hota hai, isliye block ko true lautana zaroori hai:
+        // warna `?: throw` kamyab write ko bhi timeout samajh leta hai.
         withTimeoutOrNull(WRITE_TIMEOUT_MS) {
             db.reference.updateChildren(updates).await()
+            true
         } ?: throw IOException("Timed out saving the post")
     }
 

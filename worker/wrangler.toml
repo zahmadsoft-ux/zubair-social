@@ -1,6 +1,8 @@
 name = "zubair-social-worker"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
+# Login ke paas 2 Cloudflare accounts hain: yahan fix karne se wrangler hamesha sahi account use karta hai.
+account_id = "8b6fc1e646f13e4dd4e7979e789cf703"
 
 # Yeh values secret nahi hain (koi bhi inhein dekh sakta hai), isliye yahan commit hoti hain.
 # R2_ACCOUNT_ID aur PUBLIC_BASE_URL apni values se badlo (README ke Step 1-2 dekho).
@@ -8,7 +10,7 @@ compatibility_date = "2025-01-01"
 FIREBASE_PROJECT_ID = "zubair-social"
 R2_ACCOUNT_ID = "8b6fc1e646f13e4dd4e7979e789cf703"
 R2_BUCKET = "zubair-social-images"
-PUBLIC_BASE_URL = "https://REPLACE-WITH-YOUR-BUCKET-PUBLIC-URL"
+PUBLIC_BASE_URL = "https://pub-6affecc9ea1a46d69813b4911c5179de.r2.dev"
 
 # SECRETS yahan nahi hain. Woh `wrangler secret put` se jate hain:
 #   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
