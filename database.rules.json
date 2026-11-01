@@ -31,6 +31,28 @@
         ".validate": "newData.hasChildren(['uid','imageUrl','createdAt'])",
         "caption": {
           ".validate": "newData.isString() && newData.val().length <= 2200"
+        },
+        "likeCount": {
+          ".write": "auth != null",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        }
+      }
+    },
+    "postLikes": {
+      ".read": "auth != null",
+      "$postId": {
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "notifications": {
+      "$ownerUid": {
+        ".read": "auth != null && auth.uid === $ownerUid",
+        "$notifId": {
+          ".write": "auth != null && (auth.uid === $ownerUid || newData.child('fromUid').val() === auth.uid || (!newData.exists() && data.child('fromUid').val() === auth.uid))",
+          ".validate": "!newData.exists() || newData.hasChildren(['type','fromUid','postId','createdAt'])"
         }
       }
     },
@@ -41,7 +63,10 @@
       ".read": "auth != null",
       "$postId": {
         ".write": "auth != null && newData.child('uid').val() === auth.uid && (!data.exists() || data.child('uid').val() === auth.uid)"
-      }
+      },
+      ".indexOn": [
+        "createdAt"
+      ]
     }
   }
 }

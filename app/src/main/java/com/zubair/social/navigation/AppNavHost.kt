@@ -17,6 +17,7 @@ import com.zubair.social.ui.auth.LoginScreen
 import com.zubair.social.ui.auth.SignUpScreen
 import com.zubair.social.ui.common.PlaceholderScreen
 import com.zubair.social.ui.create.CreatePostScreen
+import com.zubair.social.ui.feed.FeedScreen
 import com.zubair.social.ui.components.BottomNavBar
 import com.zubair.social.ui.components.NavTab
 import com.zubair.social.ui.profile.EditProfileScreen
@@ -83,7 +84,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                     onLoginClick = { navController.popBackStack() },
                 )
             }
-            composable(NavTab.Home.route()) { PlaceholderScreen("Home") }
+            composable(NavTab.Home.route()) { FeedScreen() }
             composable(NavTab.Search.route()) { PlaceholderScreen("Search") }
             composable(NavTab.Create.route()) {
                 CreatePostScreen(onPostCreated = { navController.navigateToTab(NavTab.Home) })
